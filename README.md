@@ -17,7 +17,7 @@ code-assistant/
 ## Installation
 
 ```bash
-git clone git@github.com:arinyaho/cosmos.git ~/.code-assistant
+git clone https://github.com/arinyaho/cosmos.git ~/.code-assistant
 ~/.code-assistant/install.sh
 ```
 
