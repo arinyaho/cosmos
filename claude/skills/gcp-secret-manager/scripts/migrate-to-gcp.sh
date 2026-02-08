@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# Migrate secrets from ~/.tokens.json to GCP Secret Manager
+# Migrate secrets from ~/.code-assistant.json to GCP Secret Manager
 # - Adds user prefix to secret names (e.g., <USERNAME>-github-token)
 # - Grants secretAccessor only to the current user
 set -euo pipefail
 
 PROJECT="${1:-my-gcp-project}"
-TOKENS_FILE="${HOME}/.tokens.json"
+TOKENS_FILE="${HOME}/.code-assistant.json"
 
 if [ ! -f "$TOKENS_FILE" ]; then
   echo "ERROR: $TOKENS_FILE not found" >&2
@@ -105,7 +105,7 @@ echo "Only you ($USER_EMAIL) have access."
 echo
 echo "Next steps:"
 echo "1. Verify: gcloud secrets list --project=$PROJECT --filter=\"name~$USER_PREFIX\""
-echo "2. Update ~/.tokens.json with this content:"
+echo "2. Update ~/.code-assistant.json with this content:"
 echo
 cat << EOF
 {
@@ -115,7 +115,7 @@ cat << EOF
     "SLACK_APP_TOKEN": "${USER_PREFIX}-slack-app-token",
     "SLACK_BOT_TOKEN": "${USER_PREFIX}-slack-bot-token",
     "SLACK_WEBHOOK_URL": "${USER_PREFIX}-slack-webhook-url",
-    "JIRA_TOKEN": "${USER_PREFIX}-jira-token",
+    "JIRA_API_TOKEN": "${USER_PREFIX}-jira-token",
     "GITHUB_TOKEN": "${USER_PREFIX}-github-token",
     "DOCKER_REGISTRY_TOKEN": "${USER_PREFIX}-docker-registry-token",
     "DOCKER_OCIR_TOKEN": "${USER_PREFIX}-docker-ocir-token",
@@ -124,5 +124,5 @@ cat << EOF
 }
 EOF
 echo
-echo "3. Backup and replace: cp ~/.tokens.json ~/.tokens.json.backup"
+echo "3. Backup and replace: cp ~/.code-assistant.json ~/.code-assistant.json.backup"
 echo "4. Delete backup after confirming everything works"
