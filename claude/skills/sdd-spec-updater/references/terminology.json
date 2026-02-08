@@ -1,0 +1,22 @@
+[
+  {
+    "canonical": "Secret Key",
+    "variants": ["SecKey", "sec_key", "secretkey"]
+  },
+  {
+    "canonical": "Encryption Key",
+    "variants": ["EncKey", "enc_key"]
+  },
+  {
+    "canonical": "Evaluation Key",
+    "variants": ["EvalKey", "eval_key"]
+  },
+  {
+    "canonical": "Metadata Key",
+    "variants": ["MetadataKey", "metadata_key", "meta_key"]
+  },
+  {
+    "canonical": "KEK (Key Encryption Key)",
+    "variants": ["key encryption key", "key-encryption-key"]
+  }
+]

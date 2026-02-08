@@ -1,0 +1,13 @@
+# OS
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+
+# Local overrides
+*.local
+*.bak
+
+# Hidden directories (auto-managed by tools)
+*/skills/.*

@@ -1,0 +1,155 @@
+---
+name: jira
+description: "Create and manage Jira issues via API/CLI: create issues, link issues, transition status, update fields, and fetch issue details. Use when the user asks to file or manage Jira tickets, or to automate Jira operations. Default all Jira content to English unless explicitly requested otherwise."
+---
+
+# Jira Operations Skill
+
+## Defaults
+
+- Write issue content in English unless the user explicitly requests another language.
+- Never echo tokens or secrets in responses.
+- Prefer Jira REST API with `curl` + `jq` when no Jira CLI is installed.
+- Jira descriptions must be sent in ADF (Atlassian Document Format), not Markdown.
+
+## Required Inputs
+
+Collect these from the user if not already available:
+
+- `JIRA_BASE_URL` (e.g., `https://<YOUR_ORG>.atlassian.net`)
+- `JIRA_EMAIL`
+- `JIRA_API_TOKEN`
+- `JIRA_PROJECT_KEY` (e.g., `ES2`)
+
+## Secret Resolution
+
+Jira credentials follow the shared GCP Secret Manager pattern
+(see `~/.claude/skills/gcp-secret-manager/SKILL.md` for full details).
+
+### How it works
+
+`~/.tokens.json` stores **references**, not actual secrets:
+
+```json
+{
+  "gcp_project": "my-gcp-project",
+  "jira": {
+    "base_url": "https://<YOUR_ORG>.atlassian.net",
+    "email": "user@example.com",
+    "project_key": "MYPROJ"
+  },
+  "secrets": {
+    "JIRA_API_TOKEN": "<USERNAME>-jira-token"
+  }
+}
+```
+
+The value `"<USERNAME>-jira-token"` is a **GCP Secret Manager secret name**, not the
+actual token. Do NOT pass it directly to curl.
+
+### 2-step resolution (when env var is not already set)
+
+If `JIRA_API_TOKEN` is not in the environment (i.e., the session bootstrap has
+not run or you are in a fresh shell), resolve it manually:
+
+```bash
+# Step 1: Read the GCP secret name from tokens.json
+SECRET_NAME=$(jq -r '.secrets.JIRA_API_TOKEN' ~/.tokens.json)
+
+# Step 2: Fetch the actual token from GCP Secret Manager
+JIRA_API_TOKEN=$(gcloud secrets versions access latest \
+  --secret="$SECRET_NAME" \
+  --project="$(jq -r '.gcp_project' ~/.tokens.json)")
+```
+
+Or use the shared fetch script to inject all secrets at once:
+
+```bash
+eval "$(~/.claude/skills/gcp-secret-manager/scripts/fetch-secrets.sh)"
+```
+
+### Non-secret config
+
+Read Jira connection details directly from `~/.tokens.json`:
+
+```bash
+JIRA_BASE_URL=$(jq -r '.jira.base_url' ~/.tokens.json)
+JIRA_EMAIL=$(jq -r '.jira.email' ~/.tokens.json)
+JIRA_PROJECT_KEY=$(jq -r '.jira.project_key' ~/.tokens.json)
+```
+
+## Common Workflows
+
+### 1) Create Issue
+
+1. Confirm summary, description, issue type, priority, labels, assignee.
+2. Build description in ADF (headings/bullets render correctly).
+3. POST to `/rest/api/3/issue`.
+
+ADF snippet example (headings + bullets):
+```json
+{
+  "type": "doc",
+  "version": 1,
+  "content": [
+    {"type": "heading","attrs":{"level":2},"content":[{"type":"text","text":"Scope / Tasks"}]},
+    {"type": "bulletList","content":[
+      {"type":"listItem","content":[{"type":"paragraph","content":[{"type":"text","text":"First task"}]}]},
+      {"type":"listItem","content":[{"type":"paragraph","content":[{"type":"text","text":"Second task"}]}]}
+    ]}
+  ]
+}
+```
+
+Example:
+```bash
+curl -sS -u "$JIRA_EMAIL:$JIRA_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -X POST "$JIRA_BASE_URL/rest/api/3/issue" \
+  -d @- <<'JSON'
+{
+  "fields": {
+    "project": {"key": "MYPROJ"},
+    "summary": "<Summary>",
+    "description": {
+      "type": "doc",
+      "version": 1,
+      "content": [{"type": "paragraph","content": [{"type": "text","text": "<Description>"}]}]
+    },
+    "issuetype": {"name": "Task"},
+    "labels": ["vct", "design"],
+    "priority": {"name": "Medium"}
+  }
+}
+JSON
+```
+
+### 2) Link Issues
+
+1. Use `/rest/api/3/issueLink`.
+2. Provide link type (e.g., `Relates`, `Blocks`).
+
+### 3) Transition Status
+
+1. GET transitions: `/rest/api/3/issue/{key}/transitions`.
+2. POST transition id to move status.
+
+### 4) Update Fields
+
+Use `PUT /rest/api/3/issue/{key}` with `fields` payload.
+
+## Validation
+
+- Ensure required fields exist for the project (issue type, priority, components).
+- If unsure, GET `/rest/api/3/issue/createmeta` for allowed fields.
+- Confirm the payload is English unless the user requested otherwise.
+
+## Output Checklist
+
+Before submitting:
+
+- Summary is concise and specific
+- Description has clear context and acceptance criteria
+- Labels and priority are set (if provided)
+- Assignee is set (if provided)
+- English language verified

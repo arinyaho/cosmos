@@ -1,0 +1,14 @@
+{
+  "gcp_project": "my-gcp-project",
+  "secrets": {
+    "GOOGLE_CLIENT_SECRET": "google-client-secret",
+    "SLACK_APP_TOKEN": "slack-app-token",
+    "SLACK_BOT_TOKEN": "slack-bot-token",
+    "SLACK_WEBHOOK_URL": "slack-webhook-url",
+    "JIRA_TOKEN": "jira-token",
+    "GITHUB_TOKEN": "github-token",
+    "DOCKER_REGISTRY_TOKEN": "docker-registry-token",
+    "DOCKER_OCIR_TOKEN": "docker-ocir-token",
+    "DOCKER_OCIR_USERNAME": "docker-ocir-username"
+  }
+}
