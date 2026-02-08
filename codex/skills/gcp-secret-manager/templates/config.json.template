@@ -1,0 +1,19 @@
+{
+  "gcp_project": "<GCP_PROJECT_ID>",
+  "jira": {
+    "base_url": "https://<YOUR_ORG>.atlassian.net",
+    "email": "<YOUR_EMAIL>",
+    "project_key": "<JIRA_PROJECT_KEY>"
+  },
+  "secrets": {
+    "JIRA_API_TOKEN": "<USERNAME>-jira-token",
+    "GITHUB_TOKEN": "<USERNAME>-github-token",
+    "GOOGLE_CLIENT_SECRET": "<USERNAME>-google-client-secret",
+    "SLACK_APP_TOKEN": "<USERNAME>-slack-app-token",
+    "SLACK_BOT_TOKEN": "<USERNAME>-slack-bot-token",
+    "SLACK_WEBHOOK_URL": "<USERNAME>-slack-webhook-url",
+    "DOCKER_REGISTRY_TOKEN": "<USERNAME>-docker-registry-token",
+    "DOCKER_OCIR_TOKEN": "<USERNAME>-docker-ocir-token",
+    "DOCKER_OCIR_USERNAME": "<USERNAME>-docker-ocir-username"
+  }
+}

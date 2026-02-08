@@ -1,13 +1,13 @@
 ---
 name: setup-tokens
-description: "Set up session environment variables for tokens and config when a task fails due to missing credentials or when the user asks to initialize tokens. Use for checking ~/.tokens.json, fetching secrets from GCP Secret Manager, and exporting env vars for the current session."
+description: "Set up session environment variables for tokens and config when a task fails due to missing credentials or when the user asks to initialize tokens. Use for checking ~/.code-assistant.json, fetching secrets from GCP Secret Manager, and exporting env vars for the current session."
 ---
 
 # Setup Tokens
 
 ## Overview
 
-Use this skill when a task needs tokens/config and they are missing. It verifies `~/.tokens.json`, fetches required secrets from GCP, and exports environment variables for the current session.
+Use this skill when a task needs tokens/config and they are missing. It verifies `~/.code-assistant.json`, fetches required secrets from GCP, and exports environment variables for the current session.
 
 ## Workflow
 
@@ -20,13 +20,13 @@ Trigger when any of these are true:
 
 ### 2) Read Non-Secret Config
 
-- Read `~/.tokens.json`.
+- Read `~/.code-assistant.json`.
 - Use non-secret values from service sections (e.g., `jira.base_url`, `jira.email`, `jira.project_key`).
-- Never store secrets directly in `~/.tokens.json` unless the user explicitly instructs.
+- Never store secrets directly in `~/.code-assistant.json` unless the user explicitly instructs.
 
 ### 3) Fetch Secrets from GCP
 
-- Use the secret mapping in `~/.tokens.json` under `secrets`.
+- Use the secret mapping in `~/.code-assistant.json` under `secrets`.
 - Fetch with:
 ```bash
 gcloud secrets versions access latest --secret=<secret-name> --project=<gcp_project>
@@ -57,7 +57,7 @@ export JIRA_API_TOKEN="<from gcloud>"
 
 ## Output Checklist
 
-- Non-secret config sourced from `~/.tokens.json`
+- Non-secret config sourced from `~/.code-assistant.json`
 - Secrets fetched via GCP Secret Manager
 - Exports performed for the current session
 - No secret printed or stored in repo files

@@ -3,7 +3,7 @@
 # Usage: eval "$(fetch-secrets.sh)"
 set -euo pipefail
 
-TOKENS_FILE="${HOME}/.tokens.json"
+TOKENS_FILE="${HOME}/.code-assistant.json"
 
 if [ ! -f "$TOKENS_FILE" ]; then
   echo "# ERROR: $TOKENS_FILE not found" >&2

@@ -2,7 +2,7 @@
 # SessionStart hook: Fetch secrets from GCP and inject into CLAUDE_ENV_FILE
 set -euo pipefail
 
-TOKENS_FILE="${HOME}/.tokens.json"
+TOKENS_FILE="${HOME}/.code-assistant.json"
 
 # Only run if CLAUDE_ENV_FILE is set (SessionStart hook)
 if [ -z "${CLAUDE_ENV_FILE:-}" ]; then

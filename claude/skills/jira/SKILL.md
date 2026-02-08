@@ -19,7 +19,7 @@ Collect these from the user if not already available:
 - `JIRA_BASE_URL` (e.g., `https://<YOUR_ORG>.atlassian.net`)
 - `JIRA_EMAIL`
 - `JIRA_API_TOKEN`
-- `JIRA_PROJECT_KEY` (e.g., `ES2`)
+- `JIRA_PROJECT_KEY` (e.g., `MYPROJ`)
 
 ## Secret Resolution
 
@@ -28,7 +28,7 @@ Jira credentials follow the shared GCP Secret Manager pattern
 
 ### How it works
 
-`~/.tokens.json` stores **references**, not actual secrets:
+`~/.code-assistant.json` stores **references**, not actual secrets:
 
 ```json
 {
@@ -53,13 +53,13 @@ If `JIRA_API_TOKEN` is not in the environment (i.e., the session bootstrap has
 not run or you are in a fresh shell), resolve it manually:
 
 ```bash
-# Step 1: Read the GCP secret name from tokens.json
-SECRET_NAME=$(jq -r '.secrets.JIRA_API_TOKEN' ~/.tokens.json)
+# Step 1: Read the GCP secret name from code-assistant.json
+SECRET_NAME=$(jq -r '.secrets.JIRA_API_TOKEN' ~/.code-assistant.json)
 
 # Step 2: Fetch the actual token from GCP Secret Manager
 JIRA_API_TOKEN=$(gcloud secrets versions access latest \
   --secret="$SECRET_NAME" \
-  --project="$(jq -r '.gcp_project' ~/.tokens.json)")
+  --project="$(jq -r '.gcp_project' ~/.code-assistant.json)")
 ```
 
 Or use the shared fetch script to inject all secrets at once:
@@ -70,12 +70,12 @@ eval "$(~/.claude/skills/gcp-secret-manager/scripts/fetch-secrets.sh)"
 
 ### Non-secret config
 
-Read Jira connection details directly from `~/.tokens.json`:
+Read Jira connection details directly from `~/.code-assistant.json`:
 
 ```bash
-JIRA_BASE_URL=$(jq -r '.jira.base_url' ~/.tokens.json)
-JIRA_EMAIL=$(jq -r '.jira.email' ~/.tokens.json)
-JIRA_PROJECT_KEY=$(jq -r '.jira.project_key' ~/.tokens.json)
+JIRA_BASE_URL=$(jq -r '.jira.base_url' ~/.code-assistant.json)
+JIRA_EMAIL=$(jq -r '.jira.email' ~/.code-assistant.json)
+JIRA_PROJECT_KEY=$(jq -r '.jira.project_key' ~/.code-assistant.json)
 ```
 
 ## Common Workflows

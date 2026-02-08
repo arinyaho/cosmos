@@ -19,21 +19,64 @@ Collect these from the user if not already available:
 - `JIRA_BASE_URL` (e.g., `https://<YOUR_ORG>.atlassian.net`)
 - `JIRA_EMAIL`
 - `JIRA_API_TOKEN`
-- `JIRA_PROJECT_KEY` (e.g., `ES2`)
+- `JIRA_PROJECT_KEY` (e.g., `MYPROJ`)
 
-## Secret Management (GCP)
+## Secret Resolution
 
-Follow `SECRETS.md` at repo root. Recommended secret name:
+Jira credentials follow the shared GCP Secret Manager pattern
+(see `~/.codex/skills/gcp-secret-manager/SKILL.md` for full details).
 
-- `${USERNAME}-jira-token`
+### How it works
 
-Add it to `~/.tokens.json` under `secrets` like the other entries, then rely on the session bootstrap to inject it as `JIRA_API_TOKEN`.
+`~/.code-assistant.json` stores **references**, not actual secrets:
 
-## Example Setup
+```json
+{
+  "gcp_project": "my-gcp-project",
+  "jira": {
+    "base_url": "https://<YOUR_ORG>.atlassian.net",
+    "email": "user@example.com",
+    "project_key": "MYPROJ"
+  },
+  "secrets": {
+    "JIRA_API_TOKEN": "<USERNAME>-jira-token"
+  }
+}
+```
 
-- `~/.tokens.json` stores non-secret Jira config under `jira`:
-  - `base_url`, `email`, `project_key`
-- `JIRA_API_TOKEN` is fetched via GCP Secret Manager (e.g., `<USERNAME>-jira-token`).
+The value `"<USERNAME>-jira-token"` is a **GCP Secret Manager secret name**, not the
+actual token. Do NOT pass it directly to curl.
+
+### 2-step resolution (when env var is not already set)
+
+If `JIRA_API_TOKEN` is not in the environment (i.e., the session bootstrap has
+not run or you are in a fresh shell), resolve it manually:
+
+```bash
+# Step 1: Read the GCP secret name from code-assistant.json
+SECRET_NAME=$(jq -r '.secrets.JIRA_API_TOKEN' ~/.code-assistant.json)
+
+# Step 2: Fetch the actual token from GCP Secret Manager
+JIRA_API_TOKEN=$(gcloud secrets versions access latest \
+  --secret="$SECRET_NAME" \
+  --project="$(jq -r '.gcp_project' ~/.code-assistant.json)")
+```
+
+Or use the shared fetch script to inject all secrets at once:
+
+```bash
+eval "$(~/.codex/skills/gcp-secret-manager/scripts/fetch-secrets.sh)"
+```
+
+### Non-secret config
+
+Read Jira connection details directly from `~/.code-assistant.json`:
+
+```bash
+JIRA_BASE_URL=$(jq -r '.jira.base_url' ~/.code-assistant.json)
+JIRA_EMAIL=$(jq -r '.jira.email' ~/.code-assistant.json)
+JIRA_PROJECT_KEY=$(jq -r '.jira.project_key' ~/.code-assistant.json)
+```
 
 ## Common Workflows
 

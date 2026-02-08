@@ -15,7 +15,7 @@ GCP Secret Manager를 통해 시크릿을 관리합니다. 로컬에 평문 시�
 
 1. **디스크에 평문 시크릿 절대 저장 안 함**
 2. **메모리에서만 유지, 프로세스 종료 시 사라짐**
-3. **~/.tokens.json에는 secret ID 참조만**
+3. **~/.code-assistant.json에는 secret ID 참조만**
 
 ## 주요 작업
 
@@ -25,7 +25,7 @@ GCP Secret Manager를 통해 시크릿을 관리합니다. 로컬에 평문 시�
 ~/.claude/skills/gcp-secret-manager/scripts/migrate-to-gcp.sh my-gcp-project
 ```
 
-기존 `~/.tokens.json`의 실제 값들을 GCP Secret Manager로 업로드합니다.
+기존 `~/.code-assistant.json`의 실제 값들을 GCP Secret Manager로 업로드합니다.
 
 ### 시크릿 Fetch
 
@@ -33,7 +33,7 @@ GCP Secret Manager를 통해 시크릿을 관리합니다. 로컬에 평문 시�
 eval "$(~/.claude/skills/gcp-secret-manager/scripts/fetch-secrets.sh)"
 ```
 
-`~/.tokens.json`에 정의된 시크릿들을 GCP에서 가져와 환경변수로 설정합니다.
+`~/.code-assistant.json`에 정의된 시크릿들을 GCP에서 가져와 환경변수로 설정합니다.
 
 ### 시크릿 추가
 
@@ -41,7 +41,7 @@ eval "$(~/.claude/skills/gcp-secret-manager/scripts/fetch-secrets.sh)"
 # 1. GCP에 시크릿 생성
 echo -n "secret-value" | gcloud secrets create my-secret --data-file=- --project=my-gcp-project
 
-# 2. ~/.tokens.json에 매핑 추가
+# 2. ~/.code-assistant.json에 매핑 추가
 # "secrets": { "MY_SECRET": "my-secret" }
 ```
 
@@ -52,7 +52,7 @@ gcloud secrets list --project=my-gcp-project
 gcloud secrets versions access latest --secret=github-token --project=my-gcp-project
 ```
 
-## ~/.tokens.json 구조
+## ~/.code-assistant.json 구조
 
 ```json
 {
@@ -60,7 +60,7 @@ gcloud secrets versions access latest --secret=github-token --project=my-gcp-pro
   "secrets": {
     "ENV_VAR_NAME": "gcp-secret-name",
     "GITHUB_TOKEN": "github-token",
-    "JIRA_TOKEN": "jira-token"
+    "JIRA_API_TOKEN": "jira-token"
   }
 }
 ```

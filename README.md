@@ -11,13 +11,22 @@ code-assistant/
 │   └── skills/          # Claude Code skills
 ├── codex/
 │   └── skills/          # OpenAI Codex custom skills
-└── install.sh           # Symlink installer
+├── config.json.template # Config template for ~/.code-assistant.json
+└── install.sh           # Symlink installer (two-pass)
 ```
 
 ## Installation
 
 ```bash
-git clone https://github.com/arinyaho/cosmos.git ~/.code-assistant
+git clone git@github.com:CryptoLabInc/code-assistant.git ~/.code-assistant
+
+# 1st run: copies config template to ~/.code-assistant.json, then exits
+~/.code-assistant/install.sh
+
+# Edit the config file — fill in placeholders, remove unused entries
+$EDITOR ~/.code-assistant.json
+
+# 2nd run: sets up symlinks for agents/skills
 ~/.code-assistant/install.sh
 ```
 
